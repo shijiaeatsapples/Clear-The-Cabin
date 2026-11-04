@@ -39,7 +39,7 @@ const DOOR_OPEN_TIME = 3.2
 
 // Player
 const SPEED = 80
-const SPEED_PER_UPGRADE = 10
+const SPEED_PER_UPGRADE = 5
 const PLAYER_Y = FLOOR_Y + 10
 
 // NPC movement
@@ -78,7 +78,7 @@ const DRAG_SPEED = 400
 const DRAG_SPEED_FALLOFF = 0.8
 const MIN_DRAG_SPEED = 60
 const MULTI_GRAB_RADIUS = 40
-const RESISTANCE_PER_UPGRADE = 0.15
+const RESISTANCE_PER_UPGRADE = 0.1
 
 // Luck
 const BASE_LUCK = 0.5
@@ -96,6 +96,8 @@ const CHAIR_DROP_RANGE = 25
 const SEATED_Y = 252
 const SIT_ANIM = "sit"
 const SEATER_HINT = "Place all highlighted NPCs on the chairs highlighted!"
+
+const COIN_CURVE = 0.003
 
 // Tutorial
 const TUTORIAL_STEP = {
@@ -125,7 +127,7 @@ const PLAYERS = {
 const PLAYER_NAMES = Object.keys(PLAYERS)
 
 const UPGRADES = {
-  speed: { label: "Speed", baseCost: 5, costGrowth: 1.6},
-  luck: { label: "Luck", baseCost: 20, costGrowth: 1.6},
-  resistance: { label: "Resistance", baseCost: 30, costGrowth: 1.6},
+  speed: { label: "Speed", baseCost: 5, costGrowth: 3},
+  luck: { label: "Luck", baseCost: 20, costGrowth: 3},
+  resistance: { label: "Resistance", baseCost: 30, costGrowth: 3},
 }

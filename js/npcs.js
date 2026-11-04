@@ -1,6 +1,3 @@
-// ============================================================================
-// Game world: NPC helpers
-// ============================================================================
 
 function followWithCamera(target) {
   camPos(clamp(target.pos.x, width() / 2, BG_WIDTH - width() / 2), height() / 2)
@@ -50,7 +47,7 @@ function pickRoamX(fromX) {
 function rollReturnToDoor(npc, crowd) {
   npc.returnWait -= dt()
   if (npc.returnWait > 0 || round.closing) return false
-  // a fully cleared side stays clear, so the way into the train can't close again
+  
   if (allCleared(crowd)) return false
 
   npc.returnWait = RETURN_CHECK_TIME
@@ -86,11 +83,10 @@ function releaseNpcToRoam(npc) {
   if (isNearDoor(npc.pos.x)) return false
 
   npc.roamX = npc.pos.x
-  npc.roamWait = rand(1, 3)
+  npc.roamWait = rand(2, 5)
   return true
 }
 
-// returns whether the NPC was dropped somewhere that counts as cleared
 function placeDroppedNpc(npc, queueNpcs) {
   if (isSeater(npc.record)) return seatNpc(npc)
   if (queueNpcs) return queueNpc(npc)
@@ -102,7 +98,7 @@ function clearNpc(npc) {
   npc.record.cleared = true
   coinSound()
   if (!npc.record.paid) {
-    save.currency += 1
+    save.currency += coinsForClear(totalCleared())
     npc.record.paid = true
   }
 }

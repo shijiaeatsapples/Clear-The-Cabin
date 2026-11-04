@@ -1,6 +1,6 @@
-// ============================================================================
-// Player stats and difficulty
-// ============================================================================
+function coinsForClear(clearedCount) {
+  return Math.round(1 + COIN_CURVE * clearedCount ** 2)
+}
 
 function upgradeLevel(name, key) {
   return save.upgrades[name]?.[key] ?? 0
