@@ -1,6 +1,3 @@
-// ============================================================================
-// Assets
-// ============================================================================
 
 const CHARACTER_SHEET = {
   sliceX: 4,
@@ -11,6 +8,16 @@ const CHARACTER_SHEET = {
     walk: { from: 8, to: 11, loop: true, speed: 12 },
     frt_walk: { from: 4, to: 7, loop: true, speed: 14 },
   },
+}
+
+const HEATHER_SPRITE = {
+  sliceX: 4,
+  sliceY: 4,
+
+  anims: {
+    idle:0,
+    walk: 2,
+  }
 }
 
 const NPC_SPRITES = ["npc1", "npc2", "npc3", "npc4", "npc5","npc6"]
@@ -52,7 +59,8 @@ function loadSpriteList(list, options) {
 }
 
 NPC_SPRITES.forEach((name, i) => {
-  loadSprite(name, `assets/NPC/NPC${i + 1}.png`, CHARACTER_SHEET)
+  const sheet = name === "npc6" ? HEATHER_SPRITE : CHARACTER_SHEET
+  loadSprite(name, `assets/NPC/NPC${i + 1}.png`, sheet)
 })
 PLAYER_NAMES.forEach((name) => {
   loadSprite(name, `assets/player/${name}_player.png`, CHARACTER_SHEET)
@@ -62,7 +70,6 @@ loadSpriteList(BACKGROUNDS)
 loadSpriteList(WELCOME_SCR)
 loadSpriteList(GAME_SCR)
 
-// colours any see-through pixel next to the sprite's edge; the step is in atlas texels (5 of 2048)
 loadShader("seaterOutline", null, `
 vec4 frag(vec2 pos, vec2 uv, vec4 color, sampler2D tex) {
   vec4 base = def_frag();
@@ -101,7 +108,7 @@ function loadArrowSprite(name, { width, height, points, fill, stroke }) {
   loadSprite(name, canvas)
 }
 
-// placeholder: swap for loadSprite("arrow", "assets/your_arrow.png"), with the image pointing right
+
 loadArrowSprite("arrow", {
   width: 48,
   height: 32,
@@ -110,7 +117,7 @@ loadArrowSprite("arrow", {
   stroke: "#ffffff",
 })
 
-// placeholder: swap for loadSprite("chair_arrow", "assets/your_arrow.png"), with the image pointing down
+
 loadArrowSprite("chair_arrow", {
   width: 32,
   height: 40,

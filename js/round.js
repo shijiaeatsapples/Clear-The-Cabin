@@ -32,7 +32,7 @@ function makeCrowd() {
     Array.from({ length: NPCS_PER_DOOR }, (_, i) => {
       const crowdX = doorX + (i - (NPCS_PER_DOOR - 1) / 2) * CROWD_SPACING
       return {
-        spriteName: choose(NPC_SPRITES),
+        spriteName: "npc6",
         crowdX,
         x: crowdX,
         y: FLOOR_Y + rand(-6, 6),
