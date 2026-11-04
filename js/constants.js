@@ -39,7 +39,7 @@ const DOOR_OPEN_TIME = 3.2
 
 // Player
 const SPEED = 80
-const SPEED_PER_UPGRADE = 8
+const SPEED_PER_UPGRADE = 10
 const PLAYER_Y = FLOOR_Y + 10
 
 // NPC movement
@@ -49,6 +49,8 @@ const ROAM_SPEED = 30
 const ROAM_IDLE_CHANCE = 0.4
 const NPCS_PER_DOOR = 2
 const CROWD_SPACING = 25
+const NPC_SCALE = 0.45
+const NPC20_SCALE = 0.3
 
 const QUEUE_ZONES = [
   { from: 240, to: 385 },
@@ -80,7 +82,7 @@ const RESISTANCE_PER_UPGRADE = 0.15
 
 // Luck
 const BASE_LUCK = 0.5
-const LUCK_PER_UPGRADE = 0.05
+const LUCK_PER_UPGRADE = 0.1
 const LUCK_DECAY_PER_LEVEL = 0.03
 const MIN_LUCK = 0.4
 
@@ -92,9 +94,8 @@ const CHAIR_WIDTH = 36
 const CHAIR_HEIGHT = 56
 const CHAIR_DROP_RANGE = 25
 const SEATED_Y = 252
-// swap for the sitting animation once it has been added to CHARACTER_SHEET
 const SIT_ANIM = "sit"
-const SEATER_HINT = "For all child, elderly, and pregnant women, place them on the chairs highlighted in yellow!"
+const SEATER_HINT = "Place all highlighted NPCs on the chairs highlighted!"
 
 // Tutorial
 const TUTORIAL_STEP = {
@@ -107,24 +108,24 @@ const TUTORIAL_STEP = {
 }
 
 const TUTORIAL_TEXT = {
-  [TUTORIAL_STEP.CLEAR_OUTSIDE]: "You have 30 seconds to drag all the players away from the doors.",
-  [TUTORIAL_STEP.ENTER_TRAIN]: "Click the train door to get INSIDE the train.",
-  [TUTORIAL_STEP.CLEAR_INSIDE]: "Quick, drag all the players away from the door!",
-  [TUTORIAL_STEP.EARN_COINS]: "For each player dragged, you would earn coins, which can be exchanged for skins and upgrades in the shop! (Click to continue)",
-  [TUTORIAL_STEP.WARNING]: "Phew... Great Job! But beware...There are some really inconsiderate passengers. Keep going! (Click to continue)",
+  [TUTORIAL_STEP.CLEAR_OUTSIDE]: "Get closer to the commuters crowding at the train doors and DRAG them away!",
+  [TUTORIAL_STEP.ENTER_TRAIN]: "Great! Now, click the train door to get INSIDE the train.",
+  [TUTORIAL_STEP.CLEAR_INSIDE]: "Quick, drag all the players away from the door! Note that there is a time limit...",
+  [TUTORIAL_STEP.EARN_COINS]: "For each player dragged, you would earn coins, which can be exchanged for skins and upgrades in the shop! [CLICK TO CONTINUE]",
+  [TUTORIAL_STEP.WARNING]: "Phew... Great Job! But beware...There are some really inconsiderate passengers... [CLICK TO CONTINUE]",
 }
 
-// Shop
 const PLAYERS = {
   edward: { price: 0, speed: SPEED, maxDrag: 1, grabRange: 100, sizeFix: 1, ability: "Ability: none", name:"EDWARD"},
   xiaoming: { price: 100, speed: SPEED, maxDrag: 1, grabRange: 160, sizeFix: 1, ability: "Ability: wider range", name:"XIAOMING"},
   jason: { price: 200, speed: SPEED - 5, maxDrag: 2, grabRange: 100, sizeFix: 1, ability: "Ability: drag 2 at once",name: "JASON" },
   tilda:{price: 500, speed: SPEED +100, maxDrag:1, grabRange: 90, sizeFix:1, ability: "Ability: zooming through the crowd",name: "TILDA"}
 }
+
 const PLAYER_NAMES = Object.keys(PLAYERS)
 
 const UPGRADES = {
-  speed: { label: "Speed", baseCost: 10, costGrowth: 1.6, maxLevel: 5 },
-  luck: { label: "Luck", baseCost: 15, costGrowth: 1.6, maxLevel: 5 },
-  resistance: { label: "Resist", baseCost: 12, costGrowth: 1.6, maxLevel: 5 },
+  speed: { label: "Speed", baseCost: 5, costGrowth: 1.6},
+  luck: { label: "Luck", baseCost: 20, costGrowth: 1.6},
+  resistance: { label: "Resistance", baseCost: 30, costGrowth: 1.6},
 }

@@ -76,13 +76,11 @@ function addPlayerStatsHUD() {
   const statsLine = addHudText(12, vec2(width() - 12, height() - 12), "botright")
   statsLine.text = `Speed: ${playerSpeed(save.equipped)}   Luck: ${luckPercent}%`
 
-  const hasTeleport = upgradeLevel(save.equipped, "teleport") > 0
   const resistanceText = `Resistance: ${Math.round(currentResistance(save.equipped, round.level) * 100)}%`
 
   const secondLine = addHudText(12, vec2(width() - 12, height() - 28), "botright")
-  secondLine.onUpdate(() => {
-    secondLine.text = hasTeleport ? `Teleport (T): ${teleportsLeft()}   ${resistanceText}` : resistanceText
-  })
+  secondLine.text = resistanceText
+
 }
 
 function addMessageBox(message, textWidth) {

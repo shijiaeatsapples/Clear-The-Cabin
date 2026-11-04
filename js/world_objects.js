@@ -51,7 +51,7 @@ function addNpcs(crowd) {
       sprite(record.spriteName, { anim: record.seated ? SIT_ANIM : "idle" }),
       pos(record.x, record.y),
       color(255, 255, 255),
-      scale(0.45),
+      scale(record.spriteName === "npc20" ? NPC20_SCALE:NPC_SCALE),
       anchor("bot"),
       area(),
       z(record.y),

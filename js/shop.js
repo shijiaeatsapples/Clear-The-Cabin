@@ -1,6 +1,3 @@
-// ============================================================================
-// Shop menu
-// ============================================================================
 
 function addShopArrowButton(frame, name, x) {
   return frame.add([
@@ -114,9 +111,7 @@ function addShopMenu(onClose) {
       const level = upgradeLevel(name, button.upgradeKey)
       button.opacity = shown
       button.label.opacity = shown
-      button.label.text = level >= maxLevel
-        ? `${label} MAX`
-        : `${label} Lv${level}\n$${upgradeCost(name, button.upgradeKey)}`
+      button.label.text = `${label} Lv${level}\n$${upgradeCost(name, button.upgradeKey)}`
     })
   })
 
