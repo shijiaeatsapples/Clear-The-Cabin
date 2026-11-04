@@ -1,4 +1,12 @@
 
+const PRICE_TAG_WIDTH = 34
+const PRICE_TEXT_SIZE = 10
+// how wide one character of the game's font is, as a share of its text size
+const FONT_CHAR_WIDTH = 0.62
+const BUY_TEXT_SIZE = 56
+// the room on the buy button between its left edge and the coin
+const BUY_TEXT_WIDTH = 176
+
 function addShopArrowButton(frame, name, x) {
   return frame.add([
     sprite(name),
@@ -34,7 +42,7 @@ function addUpgradePanel(isOpen, selectedPlayer) {
       opacity(0),
     ]),
     add([
-      text("Upgrades", { size: 12 }),
+      text("Upgrades", { size: 15 }),
       pos(centerX, y + 16),
       anchor("center"),
       color(...NAVY),
@@ -44,7 +52,7 @@ function addUpgradePanel(isOpen, selectedPlayer) {
   ]
 
   const lockedNote = add([
-    text("Buy this character to unlock upgrades", { size: 10, width: panelWidth - 28, align: "center" }),
+    text("Buy this character to unlock upgrades", { size: 12, width: panelWidth - 16, align: "center" }),
     pos(centerX, y + panelHeight / 2 + 10),
     anchor("center"),
     color(...NAVY),
@@ -68,26 +76,27 @@ function addUpgradePanel(isOpen, selectedPlayer) {
     ])
 
     const addRowPart = (parts) => row.add([...parts, z(1), opacity(0)])
+    // the title and price share the top of the row, the description gets the full width below
     const title = addRowPart([
-      text("", { size: 7 }),
-      pos(-rowWidth / 2 + 7, -7),
-      anchor("left"),
+      text("", { size: 9 }),
+      pos(-rowWidth / 2 + 6, -rowHeight / 2 + 5),
+      anchor("topleft"),
       color(...NAVY),
     ])
     const description = addRowPart([
-      text(UPGRADES[key].description, { size: 6 }),
-      pos(-rowWidth / 2 + 7, 8),
-      anchor("left"),
+      text(UPGRADES[key].description, { size: 8 }),
+      pos(-rowWidth / 2 + 6, rowHeight / 2 - 5),
+      anchor("botleft"),
       color(...NAVY),
     ])
     const priceTag = addRowPart([
-      rect(38, 22, { radius: 5 }),
-      pos(rowWidth / 2 - 25, 0),
+      rect(PRICE_TAG_WIDTH, 18, { radius: 5 }),
+      pos(rowWidth / 2 - 4 - PRICE_TAG_WIDTH / 2, -rowHeight / 2 + 13),
       anchor("center"),
       color(...NAVY),
     ])
     const priceLabel = priceTag.add([
-      text("", { size: 10 }),
+      text("", { size: PRICE_TEXT_SIZE }),
       anchor("center"),
       opacity(0),
     ])
@@ -116,6 +125,9 @@ function addUpgradePanel(isOpen, selectedPlayer) {
         const separator = key === "resistance" ? "\n" : " "
         title.text = `${UPGRADES[key].label}${separator}Lv${upgradeLevel(name, key)}`
         priceLabel.text = formatCurrency(cost)
+        // prices grow fast at high levels, so long ones shrink to stay inside the tag
+        const widthAtSizeOne = priceLabel.text.length * FONT_CHAR_WIDTH
+        priceLabel.textSize = Math.min(PRICE_TEXT_SIZE, (PRICE_TAG_WIDTH - 4) / widthAtSizeOne)
         priceTag.color = rgb(...(save.currency >= cost ? NAVY : PANEL_TOO_EXPENSIVE))
       },
     }
@@ -154,8 +166,8 @@ function addShopMenu(onClose, onEquip) {
   ])
 
   const ability = frame.add([
-    text(PLAYERS[PLAYER_NAMES[0]].ability, { size: 20 }),
-    pos(-337, 170),
+    text(PLAYERS[PLAYER_NAMES[0]].ability, { size: 28 }),
+    pos(-337, 188),
     anchor("center"),
     color(...NAVY),
     z(10),
@@ -163,8 +175,8 @@ function addShopMenu(onClose, onEquip) {
   ])
 
   const playerName = frame.add([
-    text(PLAYERS[PLAYER_NAMES[0]].name, {size:30}),
-    pos(-337, 140),
+    text(PLAYERS[PLAYER_NAMES[0]].name, {size:40}),
+    pos(-337, 145),
     anchor("center"),
     color(...NAVY),
     z(11),
@@ -185,8 +197,8 @@ function addShopMenu(onClose, onEquip) {
   ])
 
   const price = buyBtn.add([
-    text(`$${PLAYERS[PLAYER_NAMES[0]].price}`, { size: 50 }),
-    pos(-35, 0),
+    text(`$${PLAYERS[PLAYER_NAMES[0]].price}`, { size: BUY_TEXT_SIZE }),
+    pos(-40, 0),
     anchor("center"),
     color(...NAVY),
     z(100),
@@ -207,7 +219,9 @@ function addShopMenu(onClose, onEquip) {
     ability.text = PLAYERS[name].ability
     playerName.text = PLAYERS[name].name
     price.text = buyButtonLabel(name)
-    price.textSize = save.equipped === name ? 36 : 50
+    // long labels like "Equipped" shrink to fit the space beside the coin
+    const widthAtSizeOne = price.text.length * FONT_CHAR_WIDTH
+    price.textSize = Math.min(BUY_TEXT_SIZE, BUY_TEXT_WIDTH / widthAtSizeOne)
   }
 
   function browse(step) {

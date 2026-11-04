@@ -9,11 +9,11 @@ function addTutorial(background, player) {
     round.tutorialStep = TUTORIAL_STEP.CLEAR_INSIDE
   }
 
-  const { label: tutorialText } = addMessageBox("", 540)
+  const { label: tutorialText } = addMessageBox("", TUTORIAL_TEXT_WIDTH)
 
   const skipButton = add([
     rect(60, 26, { radius: 4 }),
-    pos(596, 337),
+    pos(596, MESSAGE_BOX_Y + MESSAGE_BOX_HEIGHT / 2),
     anchor("center"),
     color(224, 38, 60),
     area(),
@@ -61,7 +61,12 @@ function addTutorial(background, player) {
       round.tutorialStep = TUTORIAL_STEP.EARN_COINS
     }
 
-    tutorialText.text = TUTORIAL_TEXT[round.tutorialStep]
+    // Skip clears the step a frame before the scene changes, so there may be no message
+    const message = TUTORIAL_TEXT[round.tutorialStep]
+    if (message && tutorialText.text !== message) {
+      tutorialText.text = message
+      tutorialText.textSize = largestFittingTextSize(message, TUTORIAL_TEXT_WIDTH)
+    }
     if (skipButton.isHovering()) setCursor("pointer")
 
     const clearingStep = round.tutorialStep === TUTORIAL_STEP.CLEAR_OUTSIDE || round.tutorialStep === TUTORIAL_STEP.CLEAR_INSIDE

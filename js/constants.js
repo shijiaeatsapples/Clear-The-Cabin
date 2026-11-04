@@ -114,7 +114,13 @@ const SEATER_HINT = "Place all highlighted NPCs on the chairs highlighted!"
 
 const COIN_CURVE = 0.003
 
-// Tutorial
+
+const MESSAGE_BOX_Y = 311
+const MESSAGE_BOX_HEIGHT = 47
+const MESSAGE_MAX_TEXT_SIZE = 20
+
+
+const TUTORIAL_TEXT_WIDTH = 540
 const TUTORIAL_STEP = {
   NONE: 0,
   CLEAR_OUTSIDE: 1,
@@ -125,7 +131,7 @@ const TUTORIAL_STEP = {
 }
 
 const TUTORIAL_TEXT = {
-  [TUTORIAL_STEP.CLEAR_OUTSIDE]: "Get closer to the commuters crowding at the train doors and DRAG them away!",
+  [TUTORIAL_STEP.CLEAR_OUTSIDE]: "Get closer to the commuters crowding at the train doors by holding the right and left buttons/keys and DRAG them away!",
   [TUTORIAL_STEP.ENTER_TRAIN]: "Great! Now, click the train door to get INSIDE the train.",
   [TUTORIAL_STEP.CLEAR_INSIDE]: "Quick, drag all the players away from the door! Note that there is a time limit...",
   [TUTORIAL_STEP.EARN_COINS]: "For each player dragged, you would earn coins, which can be exchanged for skins and upgrades in the shop! [CLICK TO CONTINUE]",

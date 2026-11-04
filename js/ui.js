@@ -11,8 +11,9 @@ function addBackground(name) {
 }
 
 function formatCurrency(amount) {
-  if (amount > 1000) {
-    return `$${parseFloat((amount / 1000).toFixed(1))}k`
+  const units = [[1e9, "B"], [1e6, "M"], [1e3, "k"]]
+  for (const [size, suffix] of units) {
+    if (amount >= size) return `$${parseFloat((amount / size).toFixed(1))}${suffix}`
   }
   return `$${amount}`
 }
@@ -85,8 +86,8 @@ function addPlayerStatsHUD() {
 
 function addMessageBox(message, textWidth) {
   const box = add([
-    rect(624, 42, { radius: 6 }),
-    pos(8, 316),
+    rect(624, MESSAGE_BOX_HEIGHT, { radius: 6 }),
+    pos(8, MESSAGE_BOX_Y),
     color(...NAVY),
     outline(2, rgb(255, 255, 255)),
     fixed(),
@@ -95,11 +96,20 @@ function addMessageBox(message, textWidth) {
 
   const label = add([
     text(message, { size: 12, width: textWidth }),
-    pos(18, 337),
+    pos(18, MESSAGE_BOX_Y + MESSAGE_BOX_HEIGHT / 2),
     anchor("left"),
     fixed(),
     z(1101),
   ])
 
   return { box, label }
+}
+
+// the biggest text size at which the whole message, wrapped, still fits inside the box
+function largestFittingTextSize(message, textWidth) {
+  const availableHeight = MESSAGE_BOX_HEIGHT - 6
+  for (let size = MESSAGE_MAX_TEXT_SIZE; size > 8; size -= 0.5) {
+    if (formatText({ text: message, size, width: textWidth }).height <= availableHeight) return size
+  }
+  return 8
 }

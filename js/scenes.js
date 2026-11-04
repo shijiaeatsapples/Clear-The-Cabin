@@ -51,17 +51,17 @@ scene("intro_video", () => {
   const videoOverlay = addDoorVideoOverlay()
 
   const continueBox = add([
-    rect(170, 26, { radius: 6 }),
-    pos(center().x, 18),
+    rect(560, 70, { radius: 8 }),
+    pos(center()),
     anchor("center"),
     color(...NAVY),
-    outline(2, rgb(255, 255, 255)),
+    outline(3, rgb(255, 255, 255)),
     z(1),
     opacity(0),
   ])
   const continueLabel = add([
-    text("Click to continue", { size: 13 }),
-    pos(center().x, 18),
+    text("Click anywhere to continue", { size: 32 }),
+    pos(center()),
     anchor("center"),
     z(2),
     opacity(0),
