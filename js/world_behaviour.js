@@ -1,9 +1,3 @@
-// ============================================================================
-// Game world: behaviour
-//
-// `world` holds what these share: { player, stats, crowd, exitTo, canExit,
-// queueNpcs, dragged, stunTimer }
-// ============================================================================
 
 function canEnterDoor(world, door) {
   const blocked = unclearedNpcs().some((npc) => Math.abs(npc.pos.x - door.pos.x) < CLEAR_DIST)

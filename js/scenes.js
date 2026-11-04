@@ -1,9 +1,6 @@
-// ============================================================================
-// Game scenes
-// ============================================================================
 
 function finishRound() {
-  // the tutorial doesn't count towards the score, so everyone starts level 2 on 0
+  
   if (round.level === 1) {
     startNewGame()
     go("game_outside")
@@ -73,7 +70,7 @@ scene("game_outside", () => {
     doorVideo.destroy()
   }
 
-  // the train only arrives once per round; coming back mid-round keeps it paused with doors open
+  
   if (!round.trainArrived) {
     DOOR_OPN_OUTSIDE.currentTime = 0
     DOOR_OPN_OUTSIDE.play().catch(skipVideo)
@@ -97,32 +94,29 @@ scene("game_outside", () => {
   })
 })
 
-scene("game_over", ({ background, level, cleared }) => {
+scene("game_over", ({ background, cleared }) => {
   setCursor("default")
   addBackground(background)
 
-  // placeholder: swap this rect for the game over frame image
   add([
-    rect(360, 200),
-    pos(center()),
+    sprite("gameOver"),
+    pos(center().x,center().y+20),
     anchor("center"),
-    color(...NAVY),
-    outline(4, rgb(255, 255, 255)),
+    scale(0.8),
   ])
 
-  function addCenteredText(message, size, offsetY) {
+  function addFrameText(message, y) {
     add([
-      text(message, { size }),
-      pos(center().x, center().y + offsetY),
+      text(message, { size: 18 }),
+      pos(center().x, y),
       anchor("center"),
+      color(...NAVY),
     ])
   }
 
-  addCenteredText("Game Over", 32, -65)
-  addCenteredText(`Total people cleared: ${cleared}`, 18, -22)
-  addCenteredText(`Highscore: ${save.highScore}`, 18, 6)
-  addCenteredText(`Level: ${level}`, 18, 34)
-  addCenteredText("Click to go home", 14, 70)
+  addFrameText(`Highscore: ${save.highScore}`, 185)
+  addFrameText(`Coins earned: ${formatCurrency(round.coinsEarned)}`, 220)
+  addFrameText(`Cleared: ${cleared}`, 255)
 
   onMousePress(() => go("welcome"))
 })

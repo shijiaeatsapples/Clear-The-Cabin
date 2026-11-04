@@ -52,6 +52,7 @@ const GAME_SCR = [
   { name: "home", path: "assets/home_icon.png" },
   { name: "moveLeft", path: "assets/left.png" },
   { name: "moveRight", path: "assets/right.png" },
+  { name: "gameOver", path: "assets/gameover.png" },
 ]
 
 function loadSpriteList(list, options) {

@@ -1,14 +1,11 @@
-// ============================================================================
-// Round state
-// ============================================================================
 
-// kept outside the scenes so NPCs and the timer survive moving between them
 const round = {
   level: 1,
   timeLeft: ROUND_TIME,
   doorSoundsPlayed: false,
   trainArrived: false,
   closing: false,
+  coinsEarned: 0,
   clearedBefore: 0,
   tutorialStep: TUTORIAL_STEP.NONE,
   crowds: {},
@@ -73,6 +70,7 @@ function startRound(level) {
 function startNewGame() {
   round.crowds = {}
   round.clearedBefore = 0
+  round.coinsEarned = 0
   startRound(save.tutorialDone ? 2 : 1)
 }
 

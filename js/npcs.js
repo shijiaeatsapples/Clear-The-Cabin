@@ -98,7 +98,9 @@ function clearNpc(npc) {
   npc.record.cleared = true
   coinSound()
   if (!npc.record.paid) {
-    save.currency += coinsForClear(totalCleared())
+    const coins = coinsForClear(totalCleared())
+    save.currency += coins
+    round.coinsEarned += coins
     npc.record.paid = true
-  }
+}
 }
