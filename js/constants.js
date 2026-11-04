@@ -21,6 +21,8 @@ const PANEL_SHADOW = [150, 130, 175]
 const PANEL_TOO_EXPENSIVE = [150, 150, 160]
 
 
+const CAUSE_URL = "https://www.instagram.com/thepenguin.express/"
+
 const SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdB_4yMGxC1nSqTwnA7fEwfHtAHqR23imujGzt9xQvTz8k9dQ/viewform?usp=sharing&ouid=101018496724856667820"
 const SURVEY_FIRST_REWARD = 300
 const SURVEY_REPEAT_REWARD = 20

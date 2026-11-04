@@ -26,7 +26,7 @@ scene("welcome", () => {
     scale(0.3),
   ])
 
-  addMenuButton("ourCauseBtn", vec2(166, 272))
+  const causeBtn = addMenuButton("ourCauseBtn", vec2(166, 272))
 
   add([
     sprite("enter_label"),
@@ -45,6 +45,11 @@ scene("welcome", () => {
 
   addMenuButton("credBtn", vec2(166, 312)).onClick(credits.open)
   addMenuButton("shopBtn", vec2(166, 232)).onClick(shop.open)
+
+  // a real tap is needed here, or phones can block the new tab
+  const isOnCauseBtn = (gamePos) => !credits.isOpen() && !shop.isOpen() && causeBtn.hasPoint(gamePos)
+  const stopListening = listenForRealTap(isOnCauseBtn, () => window.open(CAUSE_URL, "_blank", "noopener"))
+  onSceneLeave(stopListening)
 
   onClick(() => {
     if (get("btn", { recursive: true }).some((b) => b.opacity !== 0 && b.isHovering())) btnSound()
