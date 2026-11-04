@@ -9,6 +9,24 @@
   </head>
   <body>
     <script src="https://unpkg.com/kaboom@3000.1.17/dist/kaboom.js"></script>
-    <script src="main.js"></script>
+    <!-- load order matters: init.js first, main.js last -->
+    <script src="js/init.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/videos.js"></script>
+    <script src="js/save.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/round.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/menus.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/welcome.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/npcs.js"></script>
+    <script src="js/world_objects.js"></script>
+    <script src="js/world_behaviour.js"></script>
+    <script src="js/scenes.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>
