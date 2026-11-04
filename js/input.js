@@ -87,6 +87,46 @@ function onTouchEnd(event) {
   }
 }
 
+// Kaboom handles input a frame late, which is too late for anything a browser only allows
+// during a real tap, like opening a tab. This runs inside the tap itself. The press has to
+// start on the target too, so a finger held from the previous scene doesn't count.
+function listenForRealTap(isOnTarget, onTap) {
+  let pressedTouchId = null
+  let mousePressed = false
+
+  const touchStart = (event) => {
+    const touch = event.changedTouches[0]
+    if (pressedTouchId === null && isOnTarget(touchToGame(touch))) pressedTouchId = touch.identifier
+  }
+  const touchEnd = (event) => {
+    for (const touch of event.changedTouches) {
+      if (touch.identifier !== pressedTouchId) continue
+      pressedTouchId = null
+      if (isOnTarget(touchToGame(touch))) onTap()
+    }
+  }
+  // the fake mouse events sent for fingers above aren't "trusted", so they're skipped here
+  const mouseDown = (event) => {
+    if (event.isTrusted) mousePressed = isOnTarget(touchToGame(event))
+  }
+  const click = (event) => {
+    if (event.isTrusted && mousePressed && isOnTarget(touchToGame(event))) onTap()
+    mousePressed = false
+  }
+
+  canvas.addEventListener("touchstart", touchStart)
+  canvas.addEventListener("touchend", touchEnd)
+  canvas.addEventListener("mousedown", mouseDown)
+  canvas.addEventListener("click", click)
+
+  return () => {
+    canvas.removeEventListener("touchstart", touchStart)
+    canvas.removeEventListener("touchend", touchEnd)
+    canvas.removeEventListener("mousedown", mouseDown)
+    canvas.removeEventListener("click", click)
+  }
+}
+
 function releaseAllFingers() {
   moveFingers.clear()
   if (mouseFingerId !== null) releaseMouseFinger(-1000, -1000)

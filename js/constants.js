@@ -20,6 +20,14 @@ const PANEL_ROW = [240, 235, 212]
 const PANEL_SHADOW = [150, 130, 175]
 const PANEL_TOO_EXPENSIVE = [150, 150, 160]
 
+
+const SURVEY_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdB_4yMGxC1nSqTwnA7fEwfHtAHqR23imujGzt9xQvTz8k9dQ/viewform?usp=sharing&ouid=101018496724856667820"
+const SURVEY_FIRST_REWARD = 300
+const SURVEY_REPEAT_REWARD = 20
+
+const SURVEY_MIN_SECONDS = 20
+const SURVEY_BUTTON = { x: 320, y: 325, width: 380, height: 36 }
+
 const HUD_LABELS = {
   round: { size: 16, color: HIGHLIGHT_YELLOW, format: (level, time) => (level === 1 ? "Tutorial" : `Level ${level}   Time: ${time}`) },
   left: { size: 16, color: HIGHLIGHT_YELLOW, format: (count) => `${count} left to clear.` },

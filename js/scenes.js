@@ -213,5 +213,9 @@ scene("game_over", ({ background, cleared }) => {
   addFrameText(`Coins earned: ${formatCurrency(round.coinsEarned)}`, 220)
   addFrameText(`Cleared: ${cleared}`, 255)
 
-  onMousePress(() => go("welcome"))
+  addSurveyButton()
+
+  onMousePress(() => {
+    if (!isOnSurveyButton(mousePos())) go("welcome")
+  })
 })

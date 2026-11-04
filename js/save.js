@@ -8,6 +8,7 @@ const DEFAULT_SAVE = {
   highScore: 0,
   tutorialDone: false,
   seaterHintSeen: false,
+  firstSurveyRewardClaimed: false,
 }
 
 function loadSave() {
