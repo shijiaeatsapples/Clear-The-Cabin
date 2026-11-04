@@ -133,24 +133,6 @@ function setupRoundTimer(world) {
   })
 }
 
-function setupTeleport(world) {
-  const { player, stats } = world
-
-  onKeyPress("t", () => {
-    if (round.closing || teleportsLeft() <= 0) return
-
-    // only people out of grab range are worth a teleport, so one can't be wasted
-    const targets = unclearedNpcs().filter((npc) => !world.dragged.includes(npc) &&
-      Math.abs(npc.pos.x - player.pos.x) > stats.grabRange)
-    if (targets.length === 0) {
-      shake(2)
-      return
-    }
-
-    player.pos.x = clamp(nearestNpc(targets, player.pos.x).pos.x, MIN_X, MAX_X)
-    round.teleportsUsed += 1
-  })
-}
 
 function setupCrowdArrow(world) {
   const { player } = world
@@ -244,7 +226,6 @@ function addGameWorld({ background, exitTo, playerX = width() / 2, canExit = () 
   setupCursor(world)
   setupNpcMovement(world)
   setupRoundTimer(world)
-  setupTeleport(world)
   setupCrowdArrow(world)
   setupPlayerMovement(world)
 

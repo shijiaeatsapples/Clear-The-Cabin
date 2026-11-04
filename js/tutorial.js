@@ -1,6 +1,3 @@
-// ============================================================================
-// Tutorial
-// ============================================================================
 
 function finishTutorial() {
   save.tutorialDone = true
@@ -50,6 +47,7 @@ function addTutorial(background, player) {
       round.tutorialStep = TUTORIAL_STEP.WARNING
     } else if (round.tutorialStep === TUTORIAL_STEP.WARNING) {
       finishTutorial()
+      round.doorSoundsPlayed = true
       round.closing = true
       go("game_inside", { playerX: player.pos.x })
     }

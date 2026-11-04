@@ -100,7 +100,6 @@ function addShopMenu(onClose) {
     addUpgradeButton("speed", -477, 445),
     addUpgradeButton("luck", -197, 445),
     addUpgradeButton("resistance", -477, 245),
-    addUpgradeButton("teleport", -197, 245),
   ]
 
   // upgrade buttons only show while hovering an owned character or the buttons themselves

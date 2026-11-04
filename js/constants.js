@@ -1,6 +1,3 @@
-// ============================================================================
-// Constants
-// ============================================================================
 
 // World
 const BG_WIDTH = 950
@@ -16,7 +13,7 @@ const HOVER_GROW = 1.1
 const PREVIEW_POS = vec2(-337, 335 + 128 * 1.2)
 const PREVIEW_SCALE = 1
 
-// Game screen labels: change the wording, size and colour of each one here
+
 const HUD_LABELS = {
   round: { size: 16, color: HIGHLIGHT_YELLOW, format: (level, time) => (level === 1 ? "Tutorial" : `Level ${level}   Time: ${time}`) },
   left: { size: 16, color: HIGHLIGHT_YELLOW, format: (count) => `${count} left to clear.` },
@@ -24,7 +21,7 @@ const HUD_LABELS = {
   cleared: { size: 12, color: [255, 255, 255], format: (count) => `Cleared: ${count}` },
   stats: { size: 12, color: [255, 255, 255], format: (speed, luck) => `Speed: ${speed}   Luck: ${luck}%` },
   resistance: { size: 12, color: [255, 255, 255], format: (percent) => `Resistance: ${percent}%` },
-  teleport: { size: 12, color: [255, 255, 255], format: (count) => `Teleport (T): ${count}` },
+
 }
 
 // On-screen movement icons
@@ -130,5 +127,4 @@ const UPGRADES = {
   speed: { label: "Speed", baseCost: 10, costGrowth: 1.6, maxLevel: 5 },
   luck: { label: "Luck", baseCost: 15, costGrowth: 1.6, maxLevel: 5 },
   resistance: { label: "Resist", baseCost: 12, costGrowth: 1.6, maxLevel: 5 },
-  teleport: { label: "Teleport", baseCost: 1000, costGrowth: 1, maxLevel: 2 },
 }

@@ -10,7 +10,6 @@ const round = {
   trainArrived: false,
   closing: false,
   clearedBefore: 0,
-  teleportsUsed: 0,
   tutorialStep: TUTORIAL_STEP.NONE,
   crowds: {},
 }
@@ -32,7 +31,7 @@ function makeCrowd() {
     Array.from({ length: NPCS_PER_DOOR }, (_, i) => {
       const crowdX = doorX + (i - (NPCS_PER_DOOR - 1) / 2) * CROWD_SPACING
       return {
-        spriteName: "npc6",
+        spriteName: choose(NPC_SPRITES),
         crowdX,
         x: crowdX,
         y: FLOOR_Y + rand(-6, 6),
@@ -74,7 +73,6 @@ function startRound(level) {
 function startNewGame() {
   round.crowds = {}
   round.clearedBefore = 0
-  round.teleportsUsed = 0
   startRound(save.tutorialDone ? 2 : 1)
 }
 
@@ -93,8 +91,4 @@ function totalCleared() {
 function recordHighScore() {
   save.highScore = Math.max(save.highScore, totalCleared())
   writeSave()
-}
-
-function teleportsLeft() {
-  return upgradeLevel(save.equipped, "teleport") - round.teleportsUsed
 }
