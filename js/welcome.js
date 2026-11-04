@@ -7,12 +7,18 @@ scene("welcome", () => {
   addCurrencyHUD()
   addBackground("bg_inside")
 
-  add([
-    sprite("edward", { anim: "frt_walk" }),
+  const walkerScale = 0.6
+  const walker = add([
+    sprite(save.equipped, { anim: "frt_walk" }),
     anchor("bot"),
-    scale(0.6),
+    scale(walkerScale),
     pos(center().x, 300),
   ])
+
+  function showEquippedWalker() {
+    walker.use(sprite(save.equipped, { anim: "frt_walk" }))
+    walker.scale = vec2(walkerScale)
+  }
 
   add([
     sprite("logo"),
@@ -32,7 +38,7 @@ scene("welcome", () => {
   let menuClosedAt = -1
   const markMenuClosed = () => { menuClosedAt = time() }
 
-  const shop = addShopMenu(markMenuClosed)
+  const shop = addShopMenu(markMenuClosed, showEquippedWalker)
   const credits = addCreditsMenu(markMenuClosed)
 
   addButtonHoverEffects()
@@ -49,7 +55,16 @@ scene("welcome", () => {
     if (time() === menuClosedAt) return
     if (get("btn", { recursive: true }).some((b) => b.opacity !== 0 && b.isHovering())) return
     startNewGame()
-    startBgm()
-    go("game_outside")
+    if (save.tutorialDone) {
+      startBgm()
+      go("game_outside")
+    } else {
+      go("intro_video")
+    }
   })
+
+  if (!save.tutorialDone) {
+    INTRO_VID.preload = "auto"
+    INTRO_VID.load()
+  }
 })

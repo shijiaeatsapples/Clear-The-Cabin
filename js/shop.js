@@ -12,7 +12,127 @@ function addShopArrowButton(frame, name, x) {
   ])
 }
 
-function addShopMenu(onClose) {
+function addUpgradePanel(isOpen, selectedPlayer) {
+  const { x, y, width: panelWidth, height: panelHeight, rowHeight, rowGap } = UPGRADE_PANEL
+  const centerX = x + panelWidth / 2
+
+ 
+  const shell = [
+    add([
+      rect(panelWidth, panelHeight, { radius: 8 }),
+      pos(x + 4, y + 4),
+      color(...PANEL_SHADOW),
+      z(3),
+      opacity(0),
+    ]),
+    add([
+      rect(panelWidth, panelHeight, { radius: 8 }),
+      pos(x, y),
+      color(...PANEL_CREAM),
+      outline(2, rgb(...NAVY)),
+      z(3),
+      opacity(0),
+    ]),
+    add([
+      text("Upgrades", { size: 12 }),
+      pos(centerX, y + 16),
+      anchor("center"),
+      color(...NAVY),
+      z(4),
+      opacity(0),
+    ]),
+  ]
+
+  const lockedNote = add([
+    text("Buy this character to unlock upgrades", { size: 10, width: panelWidth - 28, align: "center" }),
+    pos(centerX, y + panelHeight / 2 + 10),
+    anchor("center"),
+    color(...NAVY),
+    z(4),
+    opacity(0),
+  ])
+
+  function addRow(key, index) {
+    const rowWidth = panelWidth - 16
+    const row = add([
+      rect(rowWidth, rowHeight, { radius: 6 }),
+      pos(centerX, y + 34 + rowHeight / 2 + index * (rowHeight + rowGap)),
+      anchor("center"),
+      color(...PANEL_ROW),
+      outline(1, rgb(...NAVY)),
+      scale(1),
+      area(),
+      z(4),
+      opacity(0),
+      "btn",
+    ])
+
+    const addRowPart = (parts) => row.add([...parts, z(1), opacity(0)])
+    const title = addRowPart([
+      text("", { size: 7 }),
+      pos(-rowWidth / 2 + 7, -7),
+      anchor("left"),
+      color(...NAVY),
+    ])
+    const description = addRowPart([
+      text(UPGRADES[key].description, { size: 6 }),
+      pos(-rowWidth / 2 + 7, 8),
+      anchor("left"),
+      color(...NAVY),
+    ])
+    const priceTag = addRowPart([
+      rect(38, 22, { radius: 5 }),
+      pos(rowWidth / 2 - 25, 0),
+      anchor("center"),
+      color(...NAVY),
+    ])
+    const priceLabel = priceTag.add([
+      text("", { size: 10 }),
+      anchor("center"),
+      opacity(0),
+    ])
+
+    row.onClick(() => {
+      if (row.opacity === 0) return
+
+      const name = selectedPlayer()
+      const cost = upgradeCost(name, key)
+      if (save.currency < cost) {
+        shake(4)
+        return
+      }
+
+      save.currency -= cost
+      save.upgrades[name] = { ...save.upgrades[name], [key]: upgradeLevel(name, key) + 1 }
+      buySound()
+      writeSave()
+    })
+
+    return {
+      refresh(shown) {
+        const name = selectedPlayer()
+        const cost = upgradeCost(name, key)
+        ;[row, title, description, priceTag, priceLabel].forEach((part) => { part.opacity = shown ? 1 : 0 })
+        const separator = key === "resistance" ? "\n" : " "
+        title.text = `${UPGRADES[key].label}${separator}Lv${upgradeLevel(name, key)}`
+        priceLabel.text = formatCurrency(cost)
+        priceTag.color = rgb(...(save.currency >= cost ? NAVY : PANEL_TOO_EXPENSIVE))
+      },
+    }
+  }
+
+  const rows = Object.keys(UPGRADES).map(addRow)
+
+  onUpdate(() => {
+    const open = isOpen()
+    const owned = save.owned.includes(selectedPlayer())
+    shell.forEach((part) => { part.opacity = open ? 1 : 0 })
+    lockedNote.opacity = open && !owned ? 1 : 0
+    rows.forEach((row) => row.refresh(open && owned))
+  })
+}
+
+function addShopMenu(onClose, onEquip) {
   let shopIndex = 0
   const selectedPlayer = () => PLAYER_NAMES[shopIndex]
 
@@ -43,7 +163,7 @@ function addShopMenu(onClose) {
   ])
 
   const playerName = frame.add([
-    text(PLAYERS[PLAYER_NAMES], {size:30}),
+    text(PLAYERS[PLAYER_NAMES[0]].name, {size:30}),
     pos(-337, 140),
     anchor("center"),
     color(...NAVY),
@@ -51,69 +171,7 @@ function addShopMenu(onClose) {
     opacity(0)
   ])
 
-  // placeholder: swap each rect for its upgrade button image
-  function addUpgradeButton(key, x, y) {
-    const button = frame.add([
-      rect(270, 95, { radius: 12 }),
-      pos(x, y),
-      anchor("center"),
-      color(...NAVY),
-      scale(1),
-      area(),
-      z(20),
-      opacity(0.7),
-      "btn",
-      { upgradeKey: key },
-    ])
-
-    button.label = button.add([
-      text("", { size: 33, align: "center" }),
-      anchor("center"),
-      opacity(0),
-      color(255, 0, 0)
-    ])
-
-    button.onClick(() => {
-      if (button.opacity === 0) return
-
-      const name = selectedPlayer()
-      const level = upgradeLevel(name, key)
-      const cost = upgradeCost(name, key)
-
-      if (level >= UPGRADES[key].maxLevel || save.currency < cost) {
-        shake(4)
-        return
-      }
-
-      save.currency -= cost
-      save.upgrades[name] = { ...save.upgrades[name], [key]: level + 1 }
-      writeSave()
-    })
-
-    return button
-  }
-
-  const upgradeButtons = [
-    addUpgradeButton("speed", -477, 445),
-    addUpgradeButton("luck", -197, 445),
-    addUpgradeButton("resistance", -477, 245),
-  ]
-
-  // upgrade buttons only show while hovering an owned character or the buttons themselves
-  onUpdate(() => {
-    const name = selectedPlayer()
-    const canUpgrade = isOpen() && save.owned.includes(name)
-    const hovered = preview.isHovering() || upgradeButtons.some((b) => b.isHovering())
-    const shown = canUpgrade && hovered ? 1 : 0
-
-    upgradeButtons.forEach((button) => {
-      const { label, maxLevel } = UPGRADES[button.upgradeKey]
-      const level = upgradeLevel(name, button.upgradeKey)
-      button.opacity = shown
-      button.label.opacity = shown
-      button.label.text = `${label} Lv${level}\n$${upgradeCost(name, button.upgradeKey)}`
-    })
-  })
+  addUpgradePanel(isOpen, selectedPlayer)
 
   const buyBtn = frame.add([
     sprite("shopBuy"),
@@ -169,6 +227,7 @@ function addShopMenu(onClose) {
 
     if (save.owned.includes(name)) {
       save.equipped = name
+      onEquip()
     } else if (save.currency >= cost) {
       save.currency -= cost
       save.owned.push(name)

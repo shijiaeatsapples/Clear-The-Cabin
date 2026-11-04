@@ -19,6 +19,7 @@ function addMoveIcon(name, x) {
     anchor("center"),
     scale(MOVE_ICON_SCALE),
     // the images have see-through margins, so only the arrow itself is pressable
+    // (fingers use the larger zone in js/input.js instead)
     area({ scale: vec2(0.55, 0.9) }),
     opacity(MOVE_ICON_IDLE_OPACITY),
     fixed(),

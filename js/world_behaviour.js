@@ -156,15 +156,18 @@ function setupCrowdArrow(world) {
 function setupPlayerMovement(world) {
   const { player } = world
 
-  const leftIcon = addMoveIcon("moveLeft", MOVE_ICON_MARGIN)
-  const rightIcon = addMoveIcon("moveRight", width() - MOVE_ICON_MARGIN)
+  const leftIcon = addMoveIcon("moveLeft", MOVE_ICON_LEFT_X)
+  const rightIcon = addMoveIcon("moveRight", MOVE_ICON_RIGHT_X)
 
-  // sliding onto an icon while dragging an NPC doesn't count as pressing it
-  const isIconHeld = (icon) => isMouseDown() && icon.isHovering() && world.dragged.length === 0
+  // the press has to start on an icon: sliding onto one while dragging doesn't count
+  let pressStartedOnIcon = false
+  onMousePress(() => { pressStartedOnIcon = isOverMoveIcon() })
+  onMouseRelease(() => { pressStartedOnIcon = false })
+  const isIconHeld = (icon) => pressStartedOnIcon && icon.isHovering()
 
   onUpdate(() => {
-    const leftPressed = isKeyDown("left") || isKeyDown("a") || isIconHeld(leftIcon)
-    const rightPressed = isKeyDown("right") || isKeyDown("d") || isIconHeld(rightIcon)
+    const leftPressed = isKeyDown("left") || isKeyDown("a") || isIconHeld(leftIcon) || isMoveHeld(-1)
+    const rightPressed = isKeyDown("right") || isKeyDown("d") || isIconHeld(rightIcon) || isMoveHeld(1)
     let dir = 0
 
     if (world.stunTimer > 0) {

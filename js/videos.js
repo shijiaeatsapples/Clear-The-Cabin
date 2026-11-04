@@ -9,13 +9,39 @@ function createDoorVideo(src) {
   video.controls = false
   video.muted = true
   video.playsInline = true
+  // iPhones read these from the attributes: without them the video won't play inside the page
+  video.setAttribute("muted", "")
+  video.setAttribute("playsinline", "")
   video.preload = "auto"
   return video
 }
 
 const DOOR_OPN_OUTSIDE = createDoorVideo("assets/door_open_outside.MOV")
 const DOOR_CLS_INSIDE = createDoorVideo("assets/door_close_inside.mp4")
-const INTRO_VID = createDoorVideo("")
+
+// not every device can play HEVC, so the browser falls through to the H.264 copy
+function createIntroVideo() {
+  const video = document.createElement("video")
+  video.crossOrigin = "anonymous"
+  video.playsInline = true
+  video.setAttribute("playsinline", "")
+  // only new players need it: welcome.js starts the download for them
+  video.preload = "none"
+
+  const sources = [
+    { src: "assets/introvid.mov", type: 'video/mp4; codecs="hvc1.1.6.L93.B0, mp4a.40.2"' },
+    { src: "assets/introvid.mp4", type: 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"' },
+  ]
+  sources.forEach(({ src, type }) => {
+    const source = document.createElement("source")
+    source.src = src
+    source.type = type
+    video.appendChild(source)
+  })
+  return video
+}
+
+const INTRO_VID = createIntroVideo()
 
 const VIDEO_CANVAS = document.createElement("canvas")
 VIDEO_CANVAS.width = BG_WIDTH
@@ -49,6 +75,12 @@ function drawDoorCloseFrame(video) {
   VIDEO_CTX.clearRect(0, 0, VIDEO_CANVAS.width, VIDEO_CANVAS.height)
   // y values skip the video's white strips
   VIDEO_CTX.drawImage(video, 0, 117, 2850, 942, 0, 39, BG_WIDTH, 314)
+  uploadVideoFrame()
+}
+
+function drawIntroFrame(video) {
+  VIDEO_CTX.clearRect(0, 0, VIDEO_CANVAS.width, VIDEO_CANVAS.height)
+  VIDEO_CTX.drawImage(video, 0, 0, width(), height())
   uploadVideoFrame()
 }
 

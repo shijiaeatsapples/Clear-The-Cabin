@@ -14,6 +14,12 @@ const PREVIEW_POS = vec2(-337, 335 + 128 * 1.2)
 const PREVIEW_SCALE = 1
 
 
+const UPGRADE_PANEL = { x: 276, y: 106, width: 120, height: 188, rowHeight: 44, rowGap: 4 }
+const PANEL_CREAM = [251, 248, 234]
+const PANEL_ROW = [240, 235, 212]
+const PANEL_SHADOW = [150, 130, 175]
+const PANEL_TOO_EXPENSIVE = [150, 150, 160]
+
 const HUD_LABELS = {
   round: { size: 16, color: HIGHLIGHT_YELLOW, format: (level, time) => (level === 1 ? "Tutorial" : `Level ${level}   Time: ${time}`) },
   left: { size: 16, color: HIGHLIGHT_YELLOW, format: (count) => `${count} left to clear.` },
@@ -25,10 +31,17 @@ const HUD_LABELS = {
 }
 
 // On-screen movement icons
-const MOVE_ICON_SCALE = 0.5
-const MOVE_ICON_MARGIN = 35
+const MOVE_ICON_SCALE = 0.6
+const MOVE_ICON_LEFT_X = 45
+const MOVE_ICON_RIGHT_X = 107
 const MOVE_ICON_Y = 270
 const MOVE_ICON_IDLE_OPACITY = 0.7
+// the area a finger can land on to count as pressing an arrow
+const MOVE_ZONE_PADDING_X = 30
+const MOVE_ZONE_HALF_HEIGHT = 45
+
+// Intro video: seconds without progress before the player is allowed to continue anyway
+const INTRO_STALL_TIMEOUT = 15
 
 // Doors
 const DOORS = [165, 477, 787]
@@ -36,6 +49,7 @@ const DOOR_WIDTH = 95
 const DOOR_TOP = 95
 const DOOR_RANGE = 100
 const DOOR_OPEN_TIME = 3.2
+const DOOR_VIDEO_TIMEOUT = 10
 
 // Player
 const SPEED = 80
@@ -43,7 +57,7 @@ const SPEED_PER_UPGRADE = 5
 const PLAYER_Y = FLOOR_Y + 10
 
 // NPC movement
-const CLEAR_DIST = 70
+const CLEAR_DIST = 60
 const NPC_SPEED = 40
 const ROAM_SPEED = 30
 const ROAM_IDLE_CHANCE = 0.4
@@ -53,8 +67,8 @@ const NPC_SCALE = 0.45
 const NPC20_SCALE = 0.3
 
 const QUEUE_ZONES = [
-  { from: 240, to: 385 },
-  { from: 550, to: 712 },
+  { from: 230, to: 395 },
+  { from: 540, to: 722 },
 ]
 
 // NPCs walking back to the doors
@@ -63,7 +77,8 @@ const RETURN_CHANCE_STEP = 0.05
 const MAX_RETURN_CHANCE = 0.35
 
 // Round timer
-const ROUND_TIME = 30
+const ROUND_TIME = 35
+const FULL_TIME_ROUNDS = 3
 const ROUND_TIME_STEP = 2
 const MIN_ROUND_TIME = 14
 const DOOR_SOUND_TIME = 8
@@ -119,15 +134,15 @@ const TUTORIAL_TEXT = {
 
 const PLAYERS = {
   edward: { price: 0, speed: SPEED, maxDrag: 1, grabRange: 100, sizeFix: 1, ability: "Ability: none", name:"EDWARD"},
-  xiaoming: { price: 100, speed: SPEED, maxDrag: 1, grabRange: 160, sizeFix: 1, ability: "Ability: wider range", name:"XIAOMING"},
-  jason: { price: 200, speed: SPEED - 5, maxDrag: 2, grabRange: 100, sizeFix: 1, ability: "Ability: drag 2 at once",name: "JASON" },
-  tilda:{price: 500, speed: SPEED +100, maxDrag:1, grabRange: 90, sizeFix:1, ability: "Ability: zooming through the crowd",name: "TILDA"}
+  xiaoming: { price: 500, speed: SPEED, maxDrag: 1, grabRange: 160, sizeFix: 1, ability: "Ability: wider range", name:"XIAOMING"},
+  jason: { price: 1500, speed: SPEED - 5, maxDrag: 2, grabRange: 100, sizeFix: 1, ability: "Ability: drag 2 at once",name: "JASON" },
+  tilda:{price: 17500, speed: SPEED +100, maxDrag:1, grabRange: 90, sizeFix:1, ability: "Ability: zooming through the crowd",name: "TILDA"}
 }
 
 const PLAYER_NAMES = Object.keys(PLAYERS)
 
 const UPGRADES = {
-  speed: { label: "Speed", baseCost: 5, costGrowth: 3},
-  luck: { label: "Luck", baseCost: 20, costGrowth: 3},
-  resistance: { label: "Resistance", baseCost: 30, costGrowth: 3},
+  speed: { label: "Speed", description: "Walk faster", baseCost: 30, costGrowth: 3},
+  luck: { label: "Luck", description: "Less commuters \n come back", baseCost: 50, costGrowth: 3},
+  resistance: { label: "Resistance", description: "Drag faster", baseCost: 80, costGrowth: 3},
 }

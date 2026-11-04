@@ -9,12 +9,18 @@ const SOUNDS = [
   {name: "PA", path: "sounds/PA.mp3"},
 ]
 
-SOUNDS.forEach((m)=>{
+// a sound with no file yet is skipped: loading an empty path fails with a decode error
+const AVAILABLE_SOUNDS = SOUNDS.filter((m) => m.path)
+AVAILABLE_SOUNDS.forEach((m)=>{
   loadSound(m.name, m.path)
 })
 
+let bgm = null
+
 function startBgm(){
-  play("bgm",{
+  // called at every new game, so only the first call may start the music
+  if (bgm || !AVAILABLE_SOUNDS.some((m) => m.name === "bgm")) return
+  bgm = play("bgm",{
     loop:true,
     volume:0.25
   })

@@ -22,9 +22,10 @@ function currentLuck(name, level) {
   return clamp(playerLuck(name) - (level - 1) * LUCK_DECAY_PER_LEVEL, MIN_LUCK, 1)
 }
 
-// level 1 is the untimed tutorial, so level 2 is the first round with the full time
+// level 1 is the untimed tutorial, so timed rounds start at level 2
 function roundTime(level) {
-  return Math.max(ROUND_TIME - Math.max(level - 2, 0) * ROUND_TIME_STEP, MIN_ROUND_TIME)
+  const roundsPastFullTime = Math.max(level - 1 - FULL_TIME_ROUNDS, 0)
+  return Math.max(ROUND_TIME - roundsPastFullTime * ROUND_TIME_STEP, MIN_ROUND_TIME)
 }
 
 // resistance is the share of drag speed lost: it grows each level, upgrades shrink it

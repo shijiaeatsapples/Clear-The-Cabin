@@ -2,16 +2,57 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Clear The Cabin!</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+      /* stops the page scrolling and zooming, and long presses selecting things */
+      body {
+        position: fixed;
+        inset: 0;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      canvas { touch-action: none; }
+
+      #rotate-hint {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        align-items: center;
+        justify-content: center;
+        padding: 32px;
+        background: #1e3768;
+        color: #fff;
+        font: 600 20px/1.4 system-ui, sans-serif;
+        text-align: center;
+      }
+      /* the game is landscape: on a phone held upright it would be tiny */
+      @media (orientation: portrait) and (pointer: coarse) {
+        #rotate-hint { display: flex; }
+      }
     </style>
   </head>
   <body>
+    <div id="rotate-hint">Please rotate your phone sideways to play.</div>
+
     <script src="https://unpkg.com/kaboom@3000.1.17/dist/kaboom.js"></script>
 
     <script src="js/init.js"></script>
     <script src="js/constants.js"></script>
+    <script src="js/input.js"></script>
     <script src="js/assets.js"></script>
     <script src="js/audio.js"></script>
     <script src="js/videos.js"></script>
