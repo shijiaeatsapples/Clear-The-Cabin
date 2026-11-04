@@ -1244,6 +1244,66 @@ function isOverMoveIcon() {
   return get("moveIcon").some((icon) => icon.isHovering())
 }
 
+// Kaboom merges every finger into a single mouse, so lifting or moving any finger
+// would disturb a drag. Fingers that start on a movement icon are kept away from it
+// and tracked here instead, and only one other finger at a time acts as the mouse.
+const GAME_CANVAS = document.querySelector("canvas")
+const moveTouches = new Map() // finger id -> where it is on screen
+let mouseTouchId = null
+
+function touchToScreen(touch) {
+  const box = GAME_CANVAS.getBoundingClientRect()
+  const zoom = Math.min(box.width / width(), box.height / height())
+  return vec2(
+    (touch.clientX - box.left - (box.width - width() * zoom) / 2) / zoom,
+    (touch.clientY - box.top - (box.height - height() * zoom) / 2) / zoom,
+  )
+}
+
+function isTouchOnIcon(icon) {
+  return [...moveTouches.values()].some((point) => icon.hasPoint(point))
+}
+
+function routeTouches(e) {
+  // !isTrusted: the event below, sent on to Kaboom
+  if (!e.isTrusted || e.target !== GAME_CANVAS) return
+
+  e.stopImmediatePropagation()
+  if (e.cancelable) e.preventDefault()
+
+  const isStart = e.type === "touchstart"
+  const isEnd = e.type === "touchend" || e.type === "touchcancel"
+  const mouseTouches = []
+
+  for (const touch of e.changedTouches) {
+    const id = touch.identifier
+    const point = touchToScreen(touch)
+
+    if (isStart && get("moveIcon").some((icon) => icon.hasPoint(point))) {
+      moveTouches.set(id, point)
+    } else if (moveTouches.has(id)) {
+      if (isEnd) moveTouches.delete(id)
+      else moveTouches.set(id, point)
+    } else {
+      if (isStart && mouseTouchId === null) mouseTouchId = id
+      if (id !== mouseTouchId) continue
+      mouseTouches.push(touch)
+      if (isEnd) mouseTouchId = null
+    }
+  }
+
+  if (mouseTouches.length === 0) return
+  // CustomEvent because Kaboom replaces the global Event with its own class
+  const forwarded = new CustomEvent(e.type, { cancelable: true })
+  forwarded.changedTouches = mouseTouches
+  GAME_CANVAS.dispatchEvent(forwarded)
+}
+
+// on window, so this runs before Kaboom's own listeners on the canvas
+;["touchstart", "touchmove", "touchend", "touchcancel"].forEach((type) => {
+  window.addEventListener(type, routeTouches, { capture: true, passive: false })
+})
+
 function addDoors() {
   DOORS.forEach((doorX, i) => {
     add([
@@ -1507,7 +1567,7 @@ function setupPlayerMovement(world) {
   const rightIcon = addMoveIcon("moveRight", width() - MOVE_ICON_MARGIN)
 
   // sliding onto an icon while dragging an NPC doesn't count as pressing it
-  const isIconHeld = (icon) => isMouseDown() && icon.isHovering() && world.dragged.length === 0
+  const isIconHeld = (icon) => isTouchOnIcon(icon) || (isMouseDown() && icon.isHovering() && world.dragged.length === 0)
 
   onUpdate(() => {
     const leftPressed = isKeyDown("left") || isKeyDown("a") || isIconHeld(leftIcon)
