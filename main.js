@@ -22,7 +22,24 @@ const NAVY = [30, 55, 104]
 const HIGHLIGHT_YELLOW = [255, 225, 60]
 const HOVER_GROW = 1.1
 const PREVIEW_POS = vec2(-337, 335 + 128 * 1.2)
-const PREVIEW_SCALE = 1.2
+const PREVIEW_SCALE = 1
+
+// Game screen labels: change the wording, size and colour of each one here
+const HUD_LABELS = {
+  round: { size: 16, color: HIGHLIGHT_YELLOW, format: (level, time) => (level === 1 ? "Tutorial" : `Level ${level}   Time: ${time}`) },
+  left: { size: 16, color: HIGHLIGHT_YELLOW, format: (count) => `${count} left to clear.` },
+  highScore: { size: 14, color: [255, 255, 255], format: (score) => `Highscore Clearance: ${score}` },
+  cleared: { size: 12, color: [255, 255, 255], format: (count) => `Cleared: ${count}` },
+  stats: { size: 12, color: [255, 255, 255], format: (speed, luck) => `Speed: ${speed}   Luck: ${luck}%` },
+  resistance: { size: 12, color: [255, 255, 255], format: (percent) => `Resistance: ${percent}%` },
+  teleport: { size: 12, color: [255, 255, 255], format: (count) => `Teleport (T): ${count}` },
+}
+
+// On-screen movement icons
+const MOVE_ICON_SCALE = 0.5
+const MOVE_ICON_MARGIN = 35
+const MOVE_ICON_Y = 270
+const MOVE_ICON_IDLE_OPACITY = 0.7
 
 // Doors
 const DOORS = [165, 477, 787]
@@ -58,6 +75,7 @@ const MAX_RETURN_CHANCE = 0.35
 const ROUND_TIME = 30
 const ROUND_TIME_STEP = 2
 const MIN_ROUND_TIME = 14
+const DOOR_SOUND_TIME = 8
 
 // Arrow pointing at the nearest uncleared NPC
 const ARROW_TIME = 10
@@ -86,7 +104,7 @@ const CHAIR_HEIGHT = 56
 const CHAIR_DROP_RANGE = 25
 const SEATED_Y = 252
 // swap for the sitting animation once it has been added to CHARACTER_SHEET
-const SIT_ANIM = "idle"
+const SIT_ANIM = "sit"
 const SEATER_HINT = "For all child, elderly, and pregnant women, place them on the chairs highlighted in yellow!"
 
 // Tutorial
@@ -109,9 +127,10 @@ const TUTORIAL_TEXT = {
 
 // Shop
 const PLAYERS = {
-  edward: { price: 0, speed: SPEED, maxDrag: 1, grabRange: 100, sizeFix: 1, ability: "Ability: none" },
-  xiaoming: { price: 100, speed: SPEED + 10, maxDrag: 1, grabRange: 160, sizeFix: 1, ability: "Ability: wider range" },
-  jason: { price: 200, speed: SPEED - 5, maxDrag: 2, grabRange: 100, sizeFix: 1, ability: "Ability: drag 2 at once" },
+  edward: { price: 0, speed: SPEED, maxDrag: 1, grabRange: 100, sizeFix: 1, ability: "Ability: none", name:"EDWARD"},
+  xiaoming: { price: 100, speed: SPEED, maxDrag: 1, grabRange: 160, sizeFix: 1, ability: "Ability: wider range", name:"XIAOMING"},
+  jason: { price: 200, speed: SPEED - 5, maxDrag: 2, grabRange: 100, sizeFix: 1, ability: "Ability: drag 2 at once",name: "JASON" },
+  tilda:{price: 500, speed: SPEED +100, maxDrag:1, grabRange: 90, sizeFix:1, ability: "Ability: zooming through the crowd",name: "TILDA"}
 }
 const PLAYER_NAMES = Object.keys(PLAYERS)
 
@@ -131,16 +150,18 @@ const CHARACTER_SHEET = {
   sliceY: 4,
   anims: {
     idle: 0,
+    sit: {from: 0, to: 1, speed: 10},
     walk: { from: 8, to: 11, loop: true, speed: 12 },
     frt_walk: { from: 4, to: 7, loop: true, speed: 14 },
   },
 }
 
-const NPC_SPRITES = ["npc1", "npc2", "npc3", "npc4", "npc5"]
+const NPC_SPRITES = ["npc1", "npc2", "npc3", "npc4", "npc5","npc6"]
 
-// passengers who only count as cleared once dragged to their highlighted chair
 const CHAIR_NPCS = [
   { name: "npc20", path: "assets/NPC/NPC20.png" },
+  { name: "npc21", path: "assets/NPC/NPC21.png" },
+  { name: "npc22", path: "assets/NPC/NPC22.png" },
 ]
 
 const BACKGROUNDS = [
@@ -165,7 +186,77 @@ const WELCOME_SCR = [
 const GAME_SCR = [
   { name: "playerCurrency", path: "assets/player_currency.png" },
   { name: "home", path: "assets/home_icon.png" },
+  { name: "moveLeft", path: "assets/left.png" },
+  { name: "moveRight", path: "assets/right.png" },
 ]
+
+const SOUNDS = [
+  {name: "bgm", path: ""},
+  {name: "btn", path: "sounds/btn.mp3"},
+  {name: "buy", path: "sounds/buy.mp3"},
+  {name: "closing", path: "sounds/closing.mp3"},
+  {name: "coin", path: "sounds/coin.mp3"},
+  {name: "footsteps", path: "sounds/footsteps.mp3"},
+  {name: "PA", path: "sounds/PA.mp3"},
+]
+
+SOUNDS.forEach((m)=>{
+  loadSound(m.name, m.path)
+})
+
+function startBgm(){
+  play("bgm",{
+    loop:true,
+    volume:0.25
+  })
+}
+
+let footsteps = null
+
+function setFootsteps(walking){
+  if (walking && !footsteps) {
+    footsteps = play("footsteps",{
+      loop:true,
+      volume:1.5
+    })
+  } else if (!walking && footsteps) {
+    footsteps.stop()
+    footsteps = null
+  }
+}
+
+function btnSound(){
+  play("btn",{
+    volume:1
+  })
+}
+
+function buySound(){
+  play("buy",{
+    volume:1
+  })
+}
+
+function coinSound(){
+  play("coin",{
+    volume:1
+  })
+}
+
+function doorClosingSounds(){
+  if (round.doorSoundsPlayed) return
+  round.doorSoundsPlayed = true
+
+  const announcement = play("PA",{
+    volume:1
+  })
+  announcement.onEnd(() => {
+    play("closing",{
+      volume:1
+    })
+  })
+}
+
 
 function loadSpriteList(list, options) {
   list.forEach(({ name, path }) => loadSprite(name, path, options))
@@ -256,6 +347,7 @@ function createDoorVideo(src) {
 
 const DOOR_OPN_OUTSIDE = createDoorVideo("assets/door_open_outside.MOV")
 const DOOR_CLS_INSIDE = createDoorVideo("assets/door_close_inside.mp4")
+const INTRO_VID = createDoorVideo("")
 
 const VIDEO_CANVAS = document.createElement("canvas")
 VIDEO_CANVAS.width = BG_WIDTH
@@ -402,6 +494,7 @@ function returnChance(level) {
 const round = {
   level: 1,
   timeLeft: ROUND_TIME,
+  doorSoundsPlayed: false,
   trainArrived: false,
   closing: false,
   clearedBefore: 0,
@@ -456,6 +549,7 @@ function startRound(level) {
   round.clearedBefore = totalCleared()
   round.level = level
   round.timeLeft = roundTime(level)
+  round.doorSoundsPlayed = false
   round.trainArrived = false
   round.closing = false
   round.tutorialStep = level === 1 ? TUTORIAL_STEP.CLEAR_OUTSIDE : TUTORIAL_STEP.NONE
@@ -675,12 +769,21 @@ function addShopMenu(onClose) {
   ])
 
   const ability = frame.add([
-    text(PLAYERS[PLAYER_NAMES[0]].ability, { size: 33 }),
+    text(PLAYERS[PLAYER_NAMES[0]].ability, { size: 20 }),
     pos(-337, 170),
     anchor("center"),
     color(...NAVY),
     z(10),
     opacity(0),
+  ])
+
+  const playerName = frame.add([
+    text(PLAYERS[PLAYER_NAMES], {size:30}),
+    pos(-337, 140),
+    anchor("center"),
+    color(...NAVY),
+    z(11),
+    opacity(0)
   ])
 
   // placeholder: swap each rect for its upgrade button image
@@ -693,7 +796,7 @@ function addShopMenu(onClose) {
       scale(1),
       area(),
       z(20),
-      opacity(0),
+      opacity(0.7),
       "btn",
       { upgradeKey: key },
     ])
@@ -702,6 +805,7 @@ function addShopMenu(onClose) {
       text("", { size: 33, align: "center" }),
       anchor("center"),
       opacity(0),
+      color(255, 0, 0)
     ])
 
     button.onClick(() => {
@@ -781,6 +885,7 @@ function addShopMenu(onClose) {
     preview.pos = PREVIEW_POS
     preview.scale = vec2(PREVIEW_SCALE)
     ability.text = PLAYERS[name].ability
+    playerName.text = PLAYERS[name].name
     price.text = buyButtonLabel(name)
     price.textSize = save.equipped === name ? 36 : 50
   }
@@ -805,6 +910,7 @@ function addShopMenu(onClose) {
     } else if (save.currency >= cost) {
       save.currency -= cost
       save.owned.push(name)
+      buySound()
     } else {
       shake(4)
       return
@@ -814,7 +920,7 @@ function addShopMenu(onClose) {
     showPreview()
   })
 
-  const parts = [frame, cancelBtn, leftBtn, rightBtn, preview, ability, buyBtn, price]
+  const parts = [frame, cancelBtn, leftBtn, rightBtn, preview, ability, buyBtn, price, playerName]
   const setVisible = (visible) => parts.forEach((part) => { part.opacity = visible ? 1 : 0 })
 
   cancelBtn.onClick(() => {
@@ -866,6 +972,7 @@ function addButtonHoverEffects() {
   })
 }
 
+
 scene("welcome", () => {
   setCursor(CURSOR)
   addCurrencyHUD()
@@ -905,10 +1012,15 @@ scene("welcome", () => {
   addMenuButton("shopBtn", vec2(166, 232)).onClick(shop.open)
 
   onClick(() => {
+    if (get("btn", { recursive: true }).some((b) => b.opacity !== 0 && b.isHovering())) btnSound()
+  })
+
+  onClick(() => {
     if (credits.isOpen() || shop.isOpen()) return
     if (time() === menuClosedAt) return
     if (get("btn", { recursive: true }).some((b) => b.opacity !== 0 && b.isHovering())) return
     startNewGame()
+    startBgm()
     go("game_outside")
   })
 })
@@ -955,9 +1067,12 @@ function addTutorial(background, player) {
 
   onMousePress(() => {
     if (skipButton.isHovering()) {
+      btnSound()
       finishTutorial()
       startNewGame()
       go("game_outside")
+    } else if (isOverMoveIcon()) {
+      return
     } else if (round.tutorialStep === TUTORIAL_STEP.EARN_COINS) {
       round.tutorialStep = TUTORIAL_STEP.WARNING
     } else if (round.tutorialStep === TUTORIAL_STEP.WARNING) {
@@ -1089,6 +1204,7 @@ function placeDroppedNpc(npc, queueNpcs) {
 function clearNpc(npc) {
   npc.returnWait = RETURN_CHECK_TIME
   npc.record.cleared = true
+  coinSound()
   if (!npc.record.paid) {
     save.currency += 1
     npc.record.paid = true
@@ -1105,8 +1221,27 @@ function addPlayer(playerX, stats) {
     pos(playerX, PLAYER_Y),
     scale(0.5 * stats.sizeFix),
     anchor("bot"),
-    z(PLAYER_Y),
+    z(500),
   ])
+}
+
+function addMoveIcon(name, x) {
+  return add([
+    sprite(name),
+    pos(x, MOVE_ICON_Y),
+    anchor("center"),
+    scale(MOVE_ICON_SCALE),
+    // the images have see-through margins, so only the arrow itself is pressable
+    area({ scale: vec2(0.55, 0.9) }),
+    opacity(MOVE_ICON_IDLE_OPACITY),
+    fixed(),
+    z(1000),
+    "moveIcon",
+  ])
+}
+
+function isOverMoveIcon() {
+  return get("moveIcon").some((icon) => icon.isHovering())
 }
 
 function addDoors() {
@@ -1233,7 +1368,8 @@ function grabNpc(world, hit, mouse) {
 
 function setupDragging(world) {
   onMousePress(() => {
-    if (round.closing) return
+    // a press on a movement icon must not also grab an NPC or click a door behind it
+    if (round.closing || isOverMoveIcon()) return
 
     const mouse = toWorld(mousePos())
     const hit = unclearedNpcs()
@@ -1264,6 +1400,8 @@ function setupCursor(world) {
 
     if (world.dragged.length > 0) {
       setCursor("grabbing")
+    } else if (isOverMoveIcon()) {
+      setCursor("pointer")
     } else if (unclearedNpcs().some((npc) => npc.hasPoint(mouse))) {
       setCursor("grab")
     } else if (get("door").some((d) => d.hasPoint(mouse) && canEnterDoor(world, d))) {
@@ -1310,6 +1448,7 @@ function setupRoundTimer(world) {
     if (round.level === 1 || !round.trainArrived || round.closing) return
 
     round.timeLeft -= dt()
+    if (round.timeLeft <= DOOR_SOUND_TIME) doorClosingSounds()
     if (round.timeLeft > 0 && peopleLeft() > 0) return
 
     round.closing = true
@@ -1359,18 +1498,33 @@ function setupCrowdArrow(world) {
   })
 }
 
+
+//PLAYER MOVEMENT
 function setupPlayerMovement(world) {
   const { player } = world
 
+  const leftIcon = addMoveIcon("moveLeft", MOVE_ICON_MARGIN)
+  const rightIcon = addMoveIcon("moveRight", width() - MOVE_ICON_MARGIN)
+
+  // sliding onto an icon while dragging an NPC doesn't count as pressing it
+  const isIconHeld = (icon) => isMouseDown() && icon.isHovering() && world.dragged.length === 0
+
   onUpdate(() => {
+    const leftPressed = isKeyDown("left") || isKeyDown("a") || isIconHeld(leftIcon)
+    const rightPressed = isKeyDown("right") || isKeyDown("d") || isIconHeld(rightIcon)
     let dir = 0
 
     if (world.stunTimer > 0) {
       world.stunTimer -= dt()
     } else if (!round.closing) {
-      if (isKeyDown("left") || isKeyDown("a")) dir -= 1
-      if (isKeyDown("right") || isKeyDown("d")) dir += 1
+      if (leftPressed) dir -= 1
+      if (rightPressed) dir += 1
     }
+
+    setFootsteps(dir !== 0)
+
+    leftIcon.opacity = leftPressed ? 1 : MOVE_ICON_IDLE_OPACITY
+    rightIcon.opacity = rightPressed ? 1 : MOVE_ICON_IDLE_OPACITY
 
     player.pos.x = clamp(player.pos.x + dir * playerSpeed(save.equipped) * dt(), MIN_X, MAX_X)
 
@@ -1379,6 +1533,8 @@ function setupPlayerMovement(world) {
 
     followWithCamera(player)
   })
+
+  onSceneLeave(() => setFootsteps(false))
 }
 
 function addGameWorld({ background, exitTo, playerX = width() / 2, canExit = () => true, queueNpcs = false }) {
@@ -1450,6 +1606,8 @@ function playDoorClose() {
     finishRound()
   }
 
+  doorClosingSounds()
+
   DOOR_CLS_INSIDE.currentTime = 0
   DOOR_CLS_INSIDE.play().catch(finishOnce)
 
@@ -1464,6 +1622,12 @@ function playDoorClose() {
     }
   })
 }
+
+scene("intro_video", ()=>{
+  const VideoOverlay = add([
+    sprite("door_video")
+  ])
+})
 
 scene("game_inside", ({ playerX } = {}) => {
   addGameWorld({ background: "bg_inside", playerX })
@@ -1533,9 +1697,9 @@ scene("game_over", ({ background, level, cleared }) => {
 
   addCenteredText("Game Over", 32, -65)
   addCenteredText(`Total people cleared: ${cleared}`, 18, -22)
-  addCenteredText(`Highscore Clearance: ${save.highScore}`, 18, 6)
-  addCenteredText(`Level reached: ${level}`, 18, 34)
-  addCenteredText("Click to return to the start", 14, 70)
+  addCenteredText(`Highscore: ${save.highScore}`, 18, 6)
+  addCenteredText(`Level: ${level}`, 18, 34)
+  addCenteredText("Click to go home", 14, 70)
 
   onMousePress(() => go("welcome"))
 })
