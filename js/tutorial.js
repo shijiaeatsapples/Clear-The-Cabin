@@ -4,6 +4,23 @@ function finishTutorial() {
   writeSave()
 }
 
+function showTooFarWarning() {
+  // repeated clicks restart the message instead of stacking copies on top of each other
+  get("tooFarWarning").forEach(destroy)
+
+  add([
+    text(TOO_FAR_TEXT, { size: TOO_FAR_TEXT_SIZE }),
+    pos(width() / 2, TOO_FAR_Y),
+    anchor("center"),
+    color(...TOO_FAR_RED),
+    opacity(1),
+    lifespan(TOO_FAR_SECONDS, { fade: TOO_FAR_FADE }),
+    fixed(),
+    z(1100),
+    "tooFarWarning",
+  ])
+}
+
 function addTutorial(background, player) {
   if (background === "bg_inside" && round.tutorialStep === TUTORIAL_STEP.ENTER_TRAIN) {
     round.tutorialStep = TUTORIAL_STEP.CLEAR_INSIDE

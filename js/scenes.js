@@ -200,9 +200,9 @@ scene("game_over", ({ background, cleared }) => {
     scale(0.8),
   ])
 
-  function addFrameText(message, y) {
+  function addFrameText(message, y, size = 18) {
     add([
-      text(message, { size: 18 }),
+      text(message, { size }),
       pos(center().x, y),
       anchor("center"),
       color(...NAVY),
@@ -212,6 +212,7 @@ scene("game_over", ({ background, cleared }) => {
   addFrameText(`Highscore: ${save.highScore}`, 185)
   addFrameText(`Coins earned: ${formatCurrency(round.coinsEarned)}`, 220)
   addFrameText(`Cleared: ${cleared}`, 255)
+  addFrameText("Click to go home and shop", 281, 14)
 
   addSurveyButton()
 

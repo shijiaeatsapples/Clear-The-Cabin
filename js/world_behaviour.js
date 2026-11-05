@@ -22,6 +22,7 @@ function grabNpc(world, hit, mouse) {
   if (Math.abs(hit.pos.x - player.pos.x) > stats.grabRange) {
     shake(4)
     world.stunTimer = 0.1
+    if (round.level === 1) showTooFarWarning()
     return
   }
 

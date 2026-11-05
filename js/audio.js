@@ -1,6 +1,6 @@
 
 const SOUNDS = [
-  {name: "bgm", path: ""},
+  {name: "bgm", path: "sounds/bgm.mp3"},
   {name: "btn", path: "sounds/btn.mp3"},
   {name: "buy", path: "sounds/buy.mp3"},
   {name: "closing", path: "sounds/closing.mp3"},
@@ -18,11 +18,11 @@ AVAILABLE_SOUNDS.forEach((m)=>{
 let bgm = null
 
 function startBgm(){
-  // called at every new game, so only the first call may start the music
+ 
   if (bgm || !AVAILABLE_SOUNDS.some((m) => m.name === "bgm")) return
   bgm = play("bgm",{
     loop:true,
-    volume:0.25
+    volume:1
   })
 }
 

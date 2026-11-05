@@ -131,6 +131,12 @@ const MESSAGE_MAX_TEXT_SIZE = 20
 
 
 const TUTORIAL_TEXT_WIDTH = 540
+const TOO_FAR_TEXT = "Too far, move to the door!"
+const TOO_FAR_TEXT_SIZE = 22
+const TOO_FAR_RED = [224, 38, 60]
+const TOO_FAR_Y = 90
+const TOO_FAR_SECONDS = 1.5
+const TOO_FAR_FADE = 0.3
 const TUTORIAL_STEP = {
   NONE: 0,
   CLEAR_OUTSIDE: 1,
